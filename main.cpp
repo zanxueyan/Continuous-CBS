@@ -7,34 +7,40 @@
 
 int main(int argc, const char *argv[])
 {
-    if(argc > 2)
-    {
-        Config config;
-        if(argc > 3)
-            config.getConfig(argv[3]);
-        Map map = Map(config.agent_size, config.connectdness);
-        map.get_map(argv[1]);
-        Task task;
-        task.get_task(argv[2]);
-        if(map.is_roadmap())
-            task.make_ij(map);
-        else
-            task.make_ids(map.get_width());
-        CBS cbs;
-        Solution solution = cbs.find_solution(map, task, config);
-        XML_logger logger;
-        auto found = solution.found?"true":"false";
-        std::cout<< "Soulution found: " << found << "\nRuntime: "<<solution.time.count() << "\nMakespan: " << solution.makespan << "\nFlowtime: " << solution.flowtime<< "\nInitial Cost: "<<solution.init_cost<< "\nCollision Checking Time: " << solution.check_time
-             << "\nHL expanded: " << solution.high_level_expanded << "\nLL searches: " << solution.low_level_expansions << "\nLL expanded(avg): " << solution.low_level_expanded << std::endl;
-
-        logger.get_log(argv[2]);
-        logger.write_to_log_summary(solution);
-        logger.write_to_log_path(solution, map);
-        logger.save_log();
-    }
+    /* config content
+        <use_cardinal>true</use_cardinal>
+		<use_disjoint_splitting>true</use_disjoint_splitting>
+		<hlh_type>2</hlh_type>
+		<connectedness>3</connectedness>
+		<focal_weight>1.0</focal_weight>
+		<agent_size>0.5</agent_size>
+		<timelimit>30</timelimit>
+		<precision>0.0000001</precision>
+    */
+    const std::string configFile = "Examples/config.xml";
+    const std::string mapFile = "Examples/roadmap.xml";
+    const std::string taskFile = "Examples/roadmap_task.xml";
+    Config config;
+    config.getConfig(configFile.c_str());
+    Map map = Map(config.agent_size, config.connectdness);
+    map.get_map(mapFile.c_str());
+    Task task;
+    task.get_task(taskFile.c_str(),5);
+    if(map.is_roadmap())
+        task.make_ij(map);
     else
-    {
-        std::cout<<"Error! Not enough input parameters are specified!\n";
-    }
+        task.make_ids(map.get_width());
+    CBS cbs;
+    Solution solution = cbs.find_solution(map, task, config);
+    XML_logger logger;
+    auto found = solution.found?"true":"false";
+    std::cout<< "Soulution found: " << found << "\nRuntime: "<<solution.time.count() << "\nMakespan: " << solution.makespan << "\nFlowtime: " << solution.flowtime<< "\nInitial Cost: "<<solution.init_cost<< "\nCollision Checking Time: " << solution.check_time
+            << "\nHL expanded: " << solution.high_level_expanded << "\nLL searches: " << solution.low_level_expansions << "\nLL expanded(avg): " << solution.low_level_expanded << std::endl;
+
+    logger.get_log(taskFile.c_str());
+    logger.write_to_log_summary(solution);
+    logger.write_to_log_path(solution, map);
+    logger.save_log();
+
     return 0;
 }
