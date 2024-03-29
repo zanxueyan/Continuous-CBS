@@ -23,13 +23,11 @@ int main(int argc, const char *argv[])
     Config config;
     config.getConfig(configFile.c_str());
     Map map = Map(config.agent_size, config.connectdness);
-    map.get_map(mapFile.c_str());
+    map.get_roadmap(mapFile.c_str());
     Task task;
     task.get_task(taskFile.c_str(),5);
-    if(map.is_roadmap())
-        task.make_ij(map);
-    else
-        task.make_ids(map.get_width());
+    task.make_ij(map);
+
     CBS cbs;
     Solution solution = cbs.find_solution(map, task, config);
     XML_logger logger;

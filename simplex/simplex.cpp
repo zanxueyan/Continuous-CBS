@@ -92,19 +92,19 @@ namespace optimization {
     void Simplex::set_problem(Matrix coefficients, std::vector<double> costs)
     {
         int solution_dimension = coefficients.dim().second;
-        for(int i = 0; i < solution_dimension; i++)
+        for(int xloc = 0; xloc < solution_dimension; xloc++)
         {
             Matrix eye(1, solution_dimension, 0);
-            eye(i) = 1;
+            eye(xloc) = 1;
             add_constraint(Constraint(eye, CT_NON_NEGATIVE, 0));
-            add_variable(new Variable(this, std::to_string(i).c_str()));
+            add_variable(new Variable(this, std::to_string(xloc).c_str()));
         }
-        for(int i = 0; i < coefficients.dim().first; i++)
+        for(int xloc = 0; xloc < coefficients.dim().first; xloc++)
         {
             Matrix coefs(1, coefficients.dim().second);
-            for(int j = 0; j < coefficients.dim().second; j++)
-                coefs.at(0,j) = coefficients.at(i,j);
-            add_constraint(Constraint(coefs, CT_MORE_EQUAL, costs.at(i)));
+            for(int yloc = 0; yloc < coefficients.dim().second; yloc++)
+                coefs.at(0,yloc) = coefficients.at(xloc,yloc);
+            add_constraint(Constraint(coefs, CT_MORE_EQUAL, costs.at(xloc)));
         }
         Matrix goal(1, solution_dimension, 1);
         set_objective_function(ObjectiveFunction(OFT_MINIMIZE, goal));
@@ -198,8 +198,8 @@ namespace optimization {
 							Matrix coefficients(1, solution_dimension);
 							coefficients(0) = atof(token.c_str());
 
-							for (int i = 1; i < solution_dimension; ++i)
-								buffer >> coefficients(i);
+							for (int xloc = 1; xloc < solution_dimension; ++xloc)
+								buffer >> coefficients(xloc);
 
 							string ct;
 							long double bound;
@@ -226,8 +226,8 @@ namespace optimization {
 						{
 							string oft = token;
 							Matrix costs(1, solution_dimension);
-							for (int i = 0; i < solution_dimension; ++i)
-								buffer >> costs(i);
+							for (int xloc = 0; xloc < solution_dimension; ++xloc)
+								buffer >> costs(xloc);
 
 							if (oft == "maximize")
 								set_objective_function(ObjectiveFunction(OFT_MAXIMIZE, costs));
@@ -279,11 +279,11 @@ namespace optimization {
 	void Simplex::log() const {
 
 		// Title
-		for (unsigned int i = 0; i < name.length(); ++i)
+		for (unsigned int xloc = 0; xloc < name.length(); ++xloc)
 			std::cout << "=";
 		std::cout << std::endl;
 		std::cout << name << std::endl;
-		for (unsigned int i = 0; i < name.length(); ++i)
+		for (unsigned int xloc = 0; xloc < name.length(); ++xloc)
 			std::cout << "=";
 		std::cout << std::endl;
 
@@ -316,20 +316,20 @@ namespace optimization {
 
 		// Process non-negative constraints
 		int initial_solution_dimension = solution_dimension;
-		for (int i = 0; i < initial_solution_dimension; ++i) {                        // For each component of x
+		for (int xloc = 0; xloc < initial_solution_dimension; ++xloc) {                        // For each component of x
 
 			bool has_constraint = false;
 
 			// Find an x that doesn't have a non-negativity constraint on it
 			for (it = nn_constraints.begin(); it != nn_constraints.end() && !has_constraint; ++it)
-				if (it->coefficients(i) == 1)
+				if (it->coefficients(xloc) == 1)
 					has_constraint = true;
 
 			if (!has_constraint) {
 
 				// Add a non-negativity constraint
 				Matrix eye(1, solution_dimension);
-				eye(i) = 1;
+				eye(xloc) = 1;
 				this->add_constraint(Constraint(eye, CT_NON_NEGATIVE, 0));
 
 				++solution_dimension;
@@ -348,17 +348,17 @@ namespace optimization {
 
 				// Add a regular constraint
 				for (mit = constraints.begin(); mit != constraints.end(); ++mit)
-					mit->add_column(-mit->coefficients(i));
+					mit->add_column(-mit->coefficients(xloc));
 
-				objective_function.add_column(-objective_function.costs(i));
+				objective_function.add_column(-objective_function.costs(xloc));
 
 				// Update variables status          
-				string aux_name(variables.at(i)->name);
+				string aux_name(variables.at(xloc)->name);
 				Variable* auxiliary = new AuxiliaryVariable(this, (aux_name + "_minus").c_str(), variables.size());
-				Variable* splitted = new SplittedVariable(this, variables.at(i)->name.c_str(), (AuxiliaryVariable*)auxiliary);
+				Variable* splitted = new SplittedVariable(this, variables.at(xloc)->name.c_str(), (AuxiliaryVariable*)auxiliary);
 
 				// Modify variables
-				variables.at(i) = splitted;
+				variables.at(xloc) = splitted;
 				variables.push_back(auxiliary);
 			}
 		}
@@ -448,10 +448,10 @@ namespace optimization {
 		// Scans all the columns, when I find a column that is an eye for i
 		// put it in the base at position i
 
-		for (unsigned int i = 0; i < constraints.size(); ++i) {
+		for (unsigned int xloc = 0; xloc < constraints.size(); ++xloc) {
 
 			if (VERBOSE) std::cout << std::endl;
-			if (VERBOSE) std::cout << "Checking for column " << i << " of identity." << std::endl;
+			if (VERBOSE) std::cout << "Checking for column " << xloc << " of identity." << std::endl;
 
 			bool column_not_found = true;
 
@@ -461,12 +461,12 @@ namespace optimization {
 
 				bool column_match = true;
 
-				for (unsigned int j = 0; j < constraints.size() && column_match; ++j) {
+				for (unsigned int yloc = 0; yloc < constraints.size() && column_match; ++yloc) {
 
 					column_match = true;
 
-					if ((i == j && (constraints.at(j).coefficients(c) != 1)) ||
-						(i != j && constraints.at(j).coefficients(c) != 0))
+					if ((xloc == yloc && (constraints.at(yloc).coefficients(c) != 1)) ||
+						(xloc != yloc && constraints.at(yloc).coefficients(c) != 0))
 						column_match = false;
 
 				}
@@ -493,19 +493,19 @@ namespace optimization {
 
 		if (identity.contains(-1)) {
 
-			for (unsigned int i = 0; i < identity.size(); ++i) {
+			for (unsigned int xloc = 0; xloc < identity.size(); ++xloc) {
 
-				if (identity.column(i) == -1) {
+				if (identity.column(xloc) == -1) {
 
 					// Add column 1 to constraint i
 					for (unsigned int k = 0; k < constraints.size(); ++k)
-						if (k == i)
+						if (k == xloc)
 							constraints.at(k).add_column(1);
 						else
 							constraints.at(k).add_column(0);
 
 					// Solution vector is bigger
-					identity.column(i) = solution_dimension;
+					identity.column(xloc) = solution_dimension;
 					++solution_dimension;
 
 					// Create non-negative constraint for new variable
@@ -538,12 +538,12 @@ namespace optimization {
 
 		constraints_vector.resize(constraints.size(), 1);
 
-		for (unsigned int i = 0; i < constraints.size(); ++i) {
+		for (unsigned int xloc = 0; xloc < constraints.size(); ++xloc) {
 			// Set b
-			constraints_vector(i) = constraints.at(i).value;
+			constraints_vector(xloc) = constraints.at(xloc).value;
 
-			for (int j = 0; j < solution_dimension; ++j)
-				coefficients_matrix(i, j) = constraints.at(i).coefficients(j);
+			for (int yloc = 0; yloc < solution_dimension; ++yloc)
+				coefficients_matrix(xloc, yloc) = constraints.at(xloc).coefficients(yloc);
 		}
 
 		// Copy costs
@@ -571,9 +571,9 @@ namespace optimization {
 
 			// Populate current_out_of_base
 			current_out_of_base.columns.clear();
-			for (int i = 0; i < solution_dimension; ++i)
-				if (!current_base.contains(i))
-					current_out_of_base.insert(i);
+			for (int xloc = 0; xloc < solution_dimension; ++xloc)
+				if (!current_base.contains(xloc))
+					current_out_of_base.insert(xloc);
 
 			// Every inverse_recalculation steps recompute inverse from scratch
 			if (step % inverse_recalculation_rate == 0) {
@@ -581,11 +581,11 @@ namespace optimization {
 				Matrix  base_matrix((int)current_base.size());
 
 				// Unpack current base and objective costs
-				for (unsigned int j = 0; j < current_base.size(); ++j) {
-					base_costs(j) = costs(current_base.column(j));
+				for (unsigned int yloc = 0; yloc < current_base.size(); ++yloc) {
+					base_costs(yloc) = costs(current_base.column(yloc));
 
-					for (unsigned int i = 0; i < current_base.size(); ++i)
-						base_matrix(i, j) = coefficients_matrix(i, current_base.column(j));
+					for (unsigned int xloc = 0; xloc < current_base.size(); ++xloc)
+						base_matrix(xloc, yloc) = coefficients_matrix(xloc, current_base.column(yloc));
 				}
 
 				// Compute inverse
@@ -595,8 +595,8 @@ namespace optimization {
 			else {
 
 				// Unpack objective costs
-				for (unsigned int j = 0; j < current_base.size(); ++j) {
-					base_costs(j) = costs(current_base.column(j));
+				for (unsigned int yloc = 0; yloc < current_base.size(); ++yloc) {
+					base_costs(yloc) = costs(current_base.column(yloc));
 				}
 
 				Matrix old_inverse = base_inverse;
@@ -633,8 +633,8 @@ namespace optimization {
 			optimal = reduced_cost.more_equal_than(0, TOL);
 
 			bool degenerate = false;
-			for (unsigned int i = 0; i < current_base.size() && degenerate == false; ++i)
-				if (tol_equal(base_solution(i), 0, TOL))
+			for (unsigned int xloc = 0; xloc < current_base.size() && degenerate == false; ++xloc)
+				if (tol_equal(base_solution(xloc), 0, TOL))
 					degenerate = true;
 
 			if (!optimal) {
@@ -647,12 +647,12 @@ namespace optimization {
 				Matrix a_tilde;
 
 				// Bland's strategy
-				for (unsigned int i = 0; i < current_out_of_base.size() && p == -1; ++i)
-					if (reduced_cost(current_out_of_base.column(i)) < 0)
-						p = current_out_of_base.column(i);
+				for (unsigned int xloc = 0; xloc < current_out_of_base.size() && p == -1; ++xloc)
+					if (reduced_cost(current_out_of_base.column(xloc)) < 0)
+						p = current_out_of_base.column(xloc);
 
-				for (unsigned int i = 0; i < constraints.size(); ++i)
-					column_p(i) = coefficients_matrix(i, p);
+				for (unsigned int xloc = 0; xloc < constraints.size(); ++xloc)
+					column_p(xloc) = coefficients_matrix(xloc, p);
 
 				if (VERBOSE) std::cout << "The column to insert is " << p << std::endl;
 				if (VERBOSE) column_p.log("That is ...");
@@ -669,13 +669,13 @@ namespace optimization {
 
 					// Bland's strategy
 					int q_position = -1;
-					for (unsigned int i = 0; i < current_base.size(); ++i) {
+					for (unsigned int xloc = 0; xloc < current_base.size(); ++xloc) {
 
-						long double value = base_solution(i) / a_tilde(i);
+						long double value = base_solution(xloc) / a_tilde(xloc);
 
-						if (a_tilde(i) > 0 &&
+						if (a_tilde(xloc) > 0 &&
 							(q_position == -1 || value < (base_solution(q_position) / a_tilde(q_position))))
-							q_position = i;
+							q_position = xloc;
 
 					}
 
@@ -702,12 +702,12 @@ namespace optimization {
 				// Update dual variables
 				dual_variables = u;
 
-				for (unsigned int i = 0; i < constraints.size(); ++i)
-					objective_function_base(i) = costs(current_base.column(i));
+				for (unsigned int xloc = 0; xloc < constraints.size(); ++xloc)
+					objective_function_base(xloc) = costs(current_base.column(xloc));
 
-				for (int i = 0; i < solution_dimension; ++i)
-					if (current_base.contains(i))
-						full_solution(i) = base_solution(current_base.index_of(i));
+				for (int xloc = 0; xloc < solution_dimension; ++xloc)
+					if (current_base.contains(xloc))
+						full_solution(xloc) = base_solution(current_base.index_of(xloc));
 
 				if (VERBOSE) full_solution.log("Solution:");
 
@@ -728,8 +728,8 @@ namespace optimization {
 	void Simplex::print_solution() const {
 
 		std::cout << "Optimal solution is:" << std::endl;
-		for (int i = 0; i < solution_dimension; ++i)
-			std::cout << variables.at(i)->name << ":\t\t\t" << solution(i) << std::endl;
+		for (int xloc = 0; xloc < solution_dimension; ++xloc)
+			std::cout << variables.at(xloc)->name << ":\t\t\t" << solution(xloc) << std::endl;
 
 		std::cout << std::endl;
 		std::cout << "Solution value/cost:\t\t" << solution_value << std::endl;
@@ -808,9 +808,9 @@ namespace optimization {
 				// variable by reading costs vector
 				int artificial_variable = -1;
 
-				for (int i = 0; i < artificial_problem.solution_dimension; ++i)
-					if (artificial_problem.objective_function.costs(i) == 1 && artificial_problem.current_base.contains(i))
-						artificial_variable = i;
+				for (int xloc = 0; xloc < artificial_problem.solution_dimension; ++xloc)
+					if (artificial_problem.objective_function.costs(xloc) == 1 && artificial_problem.current_base.contains(xloc))
+						artificial_variable = xloc;
 
 				// If index is still -1 (no artificial variables)
 				if (artificial_variable == -1) {
@@ -837,26 +837,26 @@ namespace optimization {
 						bi_row_q(k) = artificial_problem.base_inverse(q, k);
 
 					// Find j
-					int j = -1;
-					for (unsigned int i = 0; i < standard_form_problem.current_out_of_base.size() && j == -1; ++i) {
+					int yloc = -1;
+					for (unsigned int xloc = 0; xloc < standard_form_problem.current_out_of_base.size() && yloc == -1; ++xloc) {
 
 						// Pick the ones that doesn't refer to an artificial variable
-						if (artificial_problem.costs(i) == 0) {
+						if (artificial_problem.costs(xloc) == 0) {
 							Matrix column_j((int)standard_form_problem.current_base.size(), 1);
 
 							for (unsigned int k = 0; k < standard_form_problem.current_base.size(); ++k)
-								column_j(k) = artificial_problem.coefficients_matrix(k, i);
+								column_j(k) = artificial_problem.coefficients_matrix(k, xloc);
 
 							if ((double)(bi_row_q * column_j) != 0)
-								j = i;
+								yloc = xloc;
 						}
 					}
 
-					if (j != -1) {
+					if (yloc != -1) {
 
 						// Found a j, substitute artificial_value with j
 						standard_form_problem.suggested_base = artificial_problem.current_base;
-						standard_form_problem.suggested_base.substitute(artificial_variable, j);
+						standard_form_problem.suggested_base.substitute(artificial_variable, yloc);
 						if (VERBOSE) standard_form_problem.suggested_base.log("Now initial base is");
 
 					}
@@ -877,9 +877,9 @@ namespace optimization {
 
 						// Find a constraint to eliminate (change)
 						int change = -1;
-						for (unsigned int i = 0; i < standard_form_problem.constraints.size() && change == -1; ++i)
-							if (bi_row_q(i) != 0)
-								change = i;
+						for (unsigned int xloc = 0; xloc < standard_form_problem.constraints.size() && change == -1; ++xloc)
+							if (bi_row_q(xloc) != 0)
+								change = xloc;
 
                         //std::cout << "Constraint #" << change << " must be eliminated." << std::endl;
 						has_to_be_fixed = true;

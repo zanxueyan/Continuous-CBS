@@ -63,8 +63,8 @@ namespace optimization {
 	}
 
 	void Constraint::log() const {
-		for (int i = 0; i < coefficients.dim().second; ++i)
-			std::cout << coefficients(i) << "\t";
+		for (int xloc = 0; xloc < coefficients.dim().second; ++xloc)
+			std::cout << coefficients(xloc) << "\t";
 
 		switch (type) {
 
@@ -98,8 +98,8 @@ namespace optimization {
 
 	void Constraint::add_column(long double value) {
 		AnonymousMatrix row(1, coefficients.dim().second + 1);
-		for (int i = 0; i < coefficients.dim().second; ++i)
-			row(i) = coefficients(i);
+		for (int xloc = 0; xloc < coefficients.dim().second; ++xloc)
+			row(xloc) = coefficients(xloc);
 
 		row(coefficients.dim().second) = value;
 		coefficients = row;

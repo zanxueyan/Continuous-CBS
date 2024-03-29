@@ -239,14 +239,14 @@ public:
         return _size == 0;
     }
 
-    T& operator[](int i)				{
-        TIXMLASSERT( i>= 0 && i < _size );
-        return _mem[i];
+    T& operator[](int xloc)				{
+        TIXMLASSERT( xloc>= 0 && xloc < _size );
+        return _mem[xloc];
     }
 
-    const T& operator[](int i) const	{
-        TIXMLASSERT( i>= 0 && i < _size );
-        return _mem[i];
+    const T& operator[](int xloc) const	{
+        TIXMLASSERT( xloc>= 0 && xloc < _size );
+        return _mem[xloc];
     }
 
     const T& PeekTop() const            {
@@ -357,8 +357,8 @@ public:
             _blockPtrs.Push( block );
 
             Item* blockItems = block->items;
-            for( int i = 0; i < ITEMS_PER_BLOCK - 1; ++i ) {
-                blockItems[i].next = &(blockItems[i + 1]);
+            for( int xloc = 0; xloc < ITEMS_PER_BLOCK - 1; ++xloc ) {
+                blockItems[xloc].next = &(blockItems[xloc + 1]);
             }
             blockItems[ITEMS_PER_BLOCK - 1].next = 0;
             _root = blockItems;
@@ -1118,22 +1118,22 @@ public:
     	use QueryIntValue() if you need error checking.
     */
 	int	IntValue() const {
-		int i = 0;
-		QueryIntValue(&i);
-		return i;
+		int xloc = 0;
+		QueryIntValue(&xloc);
+		return xloc;
 	}
 
 	int64_t Int64Value() const {
-		int64_t i = 0;
-		QueryInt64Value(&i);
-		return i;
+		int64_t xloc = 0;
+		QueryInt64Value(&xloc);
+		return xloc;
 	}
 
     /// Query as an unsigned integer. See IntValue()
     unsigned UnsignedValue() const			{
-        unsigned i=0;
-        QueryUnsignedValue( &i );
-        return i;
+        unsigned xloc=0;
+        QueryUnsignedValue( &xloc );
+        return xloc;
     }
     /// Query as a boolean. See IntValue()
     bool	 BoolValue() const				{

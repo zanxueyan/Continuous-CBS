@@ -51,8 +51,8 @@ namespace optimization {
 		else
 			std::cout << "max ( ";
 
-		for (int i = 0; i < costs.dim().second; ++i)
-			std::cout << costs(i) << "  ";
+		for (int xloc = 0; xloc < costs.dim().second; ++xloc)
+			std::cout << costs(xloc) << "  ";
 		std::cout << ") * x " << std::endl;
 
 	}
@@ -63,8 +63,8 @@ namespace optimization {
 
 	void ObjectiveFunction::add_column(long double value) {
 		AnonymousMatrix row(1, costs.dim().second + 1);
-		for (int i = 0; i < costs.dim().second; ++i)
-			row(i) = costs(i);
+		for (int xloc = 0; xloc < costs.dim().second; ++xloc)
+			row(xloc) = costs(xloc);
 
 		row(costs.dim().second) = value;
 		costs = row;

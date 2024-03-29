@@ -19,7 +19,7 @@ using namespace boost::multi_index;
 
 struct Agent
 {
-    double start_i, start_j, goal_i, goal_j;
+    double start_xloc, start_yloc, goal_xloc, goal_yloc;
     int start_id, goal_id;
     int id;
     double size;
@@ -29,22 +29,22 @@ struct Agent
 
 struct gNode
 {
-    double i;
-    double j;
+    double xloc;
+    double yloc;
     std::vector<int> neighbors;
-    gNode(double i_ = -1, double j_ = -1):i(i_), j(j_) {}
+    gNode(double i_ = -1, double j_ = -1):xloc(i_), yloc(j_) {}
     ~gNode() { neighbors.clear(); }
 };
 
 struct Node
 {
     int     id;
-    double  f, g, i, j;
+    double  f, g, xloc, yloc;
     Node*   parent;
     std::pair<double, double> interval;
     int interval_id;
     Node(int _id = -1, double _f = -1, double _g = -1, double _i = -1, double _j = -1, Node* _parent = nullptr, double begin = -1, double end = -1)
-        :id(_id), f(_f), g(_g), i(_i), j(_j), parent(_parent), interval(std::make_pair(begin, end)) {interval_id = 0;}
+        :id(_id), f(_f), g(_g), xloc(_i), yloc(_j), parent(_parent), interval(std::make_pair(begin, end)) {interval_id = 0;}
     bool operator <(const Node& other) const //required for heuristic calculation
     {
         return this->g < other.g;
@@ -53,10 +53,10 @@ struct Node
 
 struct Position
 {
-    double  i, j, t;
+    double  xloc, yloc, t;
     Position(double _i = -1, double _j = -1, double _t = -1)
-        :i(_i), j(_j), t(_t) {}
-    Position(const Node& node): i(node.i), j(node.j), t(node.g) {}
+        :xloc(_i), yloc(_j), t(_t) {}
+    Position(const Node& node): xloc(node.xloc), yloc(node.yloc), t(node.g) {}
 };
 
 struct Path
@@ -143,12 +143,12 @@ struct Move
 
 struct Step
 {
-    int i;
-    int j;
+    int xloc;
+    int yloc;
     int id;
     double cost;
     //Step(const Node& node): i(node.i), j(node.j), id(node.id), cost(node.g) {}
-    Step(int _i = 0, int _j = 0, int _id = 0, double _cost = -1.0): i(_i), j(_j), id(_id), cost(_cost) {}
+    Step(int _i = 0, int _j = 0, int _id = 0, double _cost = -1.0): xloc(_i), yloc(_j), id(_id), cost(_cost) {}
 };
 
 struct Conflict
@@ -353,9 +353,9 @@ public:
                 paths.at(node.paths.begin()->agentID) = *node.paths.begin();
             node = *node.parent;
         }
-        for(unsigned int i = 0; i < node.paths.size(); i++)
-            if(paths.at(i).nodes.empty())
-                paths.at(i) = node.paths.at(i);
+        for(unsigned int xloc = 0; xloc < node.paths.size(); xloc++)
+            if(paths.at(xloc).nodes.empty())
+                paths.at(xloc) = node.paths.at(xloc);
         return paths;
     }
 
@@ -386,40 +386,40 @@ struct Solution
 
 class Vector2D {
   public:
-    Vector2D(double _i = 0.0, double _j = 0.0):i(_i),j(_j){}
-    double i, j;
+    Vector2D(double _i = 0.0, double _j = 0.0):xloc(_i),yloc(_j){}
+    double xloc, yloc;
 
-    inline Vector2D operator +(const Vector2D &vec) { return Vector2D(i + vec.i, j + vec.j); }
-    inline Vector2D operator -(const Vector2D &vec) { return Vector2D(i - vec.i, j - vec.j); }
-    inline Vector2D operator -() { return Vector2D(-i,-j); }
-    inline Vector2D operator /(const double &num) { return Vector2D(i/num, j/num); }
-    inline Vector2D operator *(const double &num) { return Vector2D(i*num, j*num); }
-    inline double operator *(const Vector2D &vec){ return i*vec.i + j*vec.j; }
-    inline void operator +=(const Vector2D &vec) { i += vec.i; j += vec.j; }
-    inline void operator -=(const Vector2D &vec) { i -= vec.i; j -= vec.j; }
+    inline Vector2D operator +(const Vector2D &vec) { return Vector2D(xloc + vec.xloc, yloc + vec.yloc); }
+    inline Vector2D operator -(const Vector2D &vec) { return Vector2D(xloc - vec.xloc, yloc - vec.yloc); }
+    inline Vector2D operator -() { return Vector2D(-xloc,-yloc); }
+    inline Vector2D operator /(const double &num) { return Vector2D(xloc/num, yloc/num); }
+    inline Vector2D operator *(const double &num) { return Vector2D(xloc*num, yloc*num); }
+    inline double operator *(const Vector2D &vec){ return xloc*vec.xloc + yloc*vec.yloc; }
+    inline void operator +=(const Vector2D &vec) { xloc += vec.xloc; yloc += vec.yloc; }
+    inline void operator -=(const Vector2D &vec) { xloc -= vec.xloc; yloc -= vec.yloc; }
 };
 
 class Point {
 public:
-    double i;
-    double j;
+    double xloc;
+    double yloc;
 
-    Point(double _i = 0.0, double _j = 0.0):i (_i), j (_j){}
-    Point operator-(Point &p){return Point(i - p.i, j - p.j);}
-    int operator== (Point &p){return (i == p.i) && (j == p.j);}
+    Point(double _i = 0.0, double _j = 0.0):xloc (_i), yloc (_j){}
+    Point operator-(Point &p){return Point(xloc - p.xloc, yloc - p.yloc);}
+    int operator== (Point &p){return (xloc == p.xloc) && (yloc == p.yloc);}
     int classify(Point &pO, Point &p1)
     {
         Point p2 = *this;
         Point a = p1 - pO;
         Point b = p2 - pO;
-        double sa = a.i * b.j - b.i * a.j;
+        double sa = a.xloc * b.yloc - b.xloc * a.yloc;
         if (sa > 0.0)
             return 1;//LEFT;
         if (sa < 0.0)
             return 2;//RIGHT;
-        if ((a.i * b.i < 0.0) || (a.j * b.j < 0.0))
+        if ((a.xloc * b.xloc < 0.0) || (a.yloc * b.yloc < 0.0))
             return 3;//BEHIND;
-        if ((a.i*a.i + a.j*a.j) < (b.i*b.i + b.j*b.j))
+        if ((a.xloc*a.xloc + a.yloc*a.yloc) < (b.xloc*b.xloc + b.yloc*b.yloc))
             return 4;//BEYOND;
         if (pO == p2)
             return 5;//ORIGIN;

@@ -66,21 +66,21 @@ void XML_logger::write_to_log_path(const Solution &solution, const Map &map)
 
     tinyxml2::XMLElement *agent, *path;
 
-    for(int i = 0; i < int(solution.paths.size()); i++)
+    for(int xloc = 0; xloc < int(solution.paths.size()); xloc++)
     {
         agent = doc->NewElement(CNS_TAG_AGENT);
-        agent->SetAttribute(CNS_TAG_ATTR_NUM,i);
+        agent->SetAttribute(CNS_TAG_ATTR_NUM,xloc);
         element->LinkEndChild(agent);
 
         path = doc->NewElement(CNS_TAG_PATH);
         //path->SetAttribute(CNS_TAG_ATTR_NUM, i);
-        path->SetAttribute(CNS_TAG_ATTR_DURATION, solution.paths[i].cost);
+        path->SetAttribute(CNS_TAG_ATTR_DURATION, solution.paths[xloc].cost);
         agent->LinkEndChild(path);
 
         //hplevel = doc->NewElement(CNS_TAG_HPLEVEL);
         //path->LinkEndChild(hplevel);
-        auto iter = solution.paths[i].nodes.begin();
-        auto it = solution.paths[i].nodes.begin();
+        auto iter = solution.paths[xloc].nodes.begin();
+        auto it = solution.paths[xloc].nodes.begin();
         int partnumber(0);
         tinyxml2::XMLElement *part;
         /*part = doc->NewElement(CNS_TAG_SECTION);
@@ -92,7 +92,7 @@ void XML_logger::write_to_log_path(const Solution &solution, const Map &map)
         part->SetAttribute(CNS_TAG_ATTR_LENGTH, iter->g);
         hplevel->LinkEndChild(part);
         partnumber++;*/
-        while(iter != std::prev(solution.paths[i].nodes.end()))
+        while(iter != std::prev(solution.paths[xloc].nodes.end()))
         {
             part = doc->NewElement(CNS_TAG_SECTION);
             part->SetAttribute(CNS_TAG_ATTR_NUM, partnumber);

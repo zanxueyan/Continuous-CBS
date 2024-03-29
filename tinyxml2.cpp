@@ -325,8 +325,8 @@ const char* StrPair::GetStr()
                     }
                     else {
                         bool entityFound = false;
-                        for( int i = 0; i < NUM_ENTITIES; ++i ) {
-                            const Entity& entity = entities[i];
+                        for( int xloc = 0; xloc < NUM_ENTITIES; ++xloc ) {
+                            const Entity& entity = entities[xloc];
                             if ( strncmp( p + 1, entity.pattern, entity.length ) == 0
                                     && *( p + entity.length + 1 ) == ';' ) {
                                 // Found an entity - convert.
@@ -1501,23 +1501,23 @@ const char* XMLElement::Attribute( const char* name, const char* value ) const
 
 int XMLElement::IntAttribute(const char* name, int defaultValue) const 
 {
-	int i = defaultValue;
-	QueryIntAttribute(name, &i);
-	return i;
+	int xloc = defaultValue;
+	QueryIntAttribute(name, &xloc);
+	return xloc;
 }
 
 unsigned XMLElement::UnsignedAttribute(const char* name, unsigned defaultValue) const 
 {
-	unsigned i = defaultValue;
-	QueryUnsignedAttribute(name, &i);
-	return i;
+	unsigned xloc = defaultValue;
+	QueryUnsignedAttribute(name, &xloc);
+	return xloc;
 }
 
 int64_t XMLElement::Int64Attribute(const char* name, int64_t defaultValue) const 
 {
-	int64_t i = defaultValue;
-	QueryInt64Attribute(name, &i);
-	return i;
+	int64_t xloc = defaultValue;
+	QueryInt64Attribute(name, &xloc);
+	return xloc;
 }
 
 bool XMLElement::BoolAttribute(const char* name, bool defaultValue) const 
@@ -1688,23 +1688,23 @@ XMLError XMLElement::QueryFloatText( float* fval ) const
 
 int XMLElement::IntText(int defaultValue) const
 {
-	int i = defaultValue;
-	QueryIntText(&i);
-	return i;
+	int xloc = defaultValue;
+	QueryIntText(&xloc);
+	return xloc;
 }
 
 unsigned XMLElement::UnsignedText(unsigned defaultValue) const
 {
-	unsigned i = defaultValue;
-	QueryUnsignedText(&i);
-	return i;
+	unsigned xloc = defaultValue;
+	QueryUnsignedText(&xloc);
+	return xloc;
 }
 
 int64_t XMLElement::Int64Text(int64_t defaultValue) const
 {
-	int64_t i = defaultValue;
-	QueryInt64Text(&i);
-	return i;
+	int64_t xloc = defaultValue;
+	QueryInt64Text(&xloc);
+	return xloc;
 }
 
 bool XMLElement::BoolText(bool defaultValue) const
@@ -2326,12 +2326,12 @@ XMLPrinter::XMLPrinter( FILE* file, bool compact, int depth ) :
     _processEntities( true ),
     _compactMode( compact )
 {
-    for( int i=0; i<ENTITY_RANGE; ++i ) {
-        _entityFlag[i] = false;
-        _restrictedEntityFlag[i] = false;
+    for( int xloc=0; xloc<ENTITY_RANGE; ++xloc ) {
+        _entityFlag[xloc] = false;
+        _restrictedEntityFlag[xloc] = false;
     }
-    for( int i=0; i<NUM_ENTITIES; ++i ) {
-        const char entityValue = entities[i].value;
+    for( int xloc=0; xloc<NUM_ENTITIES; ++xloc ) {
+        const char entityValue = entities[xloc].value;
         TIXMLASSERT( ((unsigned char)entityValue) < ENTITY_RANGE );
         _entityFlag[ (unsigned char)entityValue ] = true;
     }
@@ -2366,7 +2366,7 @@ void XMLPrinter::Print( const char* format, ... )
 
 void XMLPrinter::PrintSpace( int depth )
 {
-    for( int i=0; i<depth; ++i ) {
+    for( int xloc=0; xloc<depth; ++xloc ) {
         Print( "    " );
     }
 }
@@ -2395,9 +2395,9 @@ void XMLPrinter::PrintString( const char* p, bool restricted )
                         p += toPrint;
                     }
                     bool entityPatternPrinted = false;
-                    for( int i=0; i<NUM_ENTITIES; ++i ) {
-                        if ( entities[i].value == *q ) {
-                            Print( "&%s;", entities[i].pattern );
+                    for( int xloc=0; xloc<NUM_ENTITIES; ++xloc ) {
+                        if ( entities[xloc].value == *q ) {
+                            Print( "&%s;", entities[xloc].pattern );
                             entityPatternPrinted = true;
                             break;
                         }

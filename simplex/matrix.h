@@ -162,10 +162,10 @@ namespace pilal {
 		void empty();
 
 		/** Fills a row of the matrix with elements in string row. */
-		void set_row(int i, char const* row);
+		void set_row(int xloc, char const* row);
 
 		/** Fills a column of the matrix with elements in string column. */
-		void set_column(int j, char const* column);
+		void set_column(int yloc, char const* column);
 
 		/** Fills the matrix with the elements in values. */
 		void set_values(char const* values);
@@ -233,10 +233,10 @@ namespace pilal {
 		=========================================================*/
 
 		/** Element retrieval with one index. */
-		long double& operator() (int i);
+		long double& operator() (int xloc);
 
 		/** Element retrieval with one index (const). */
-		long double const& operator() (int i) const;
+		long double const& operator() (int xloc) const;
 
 		/** Element retrieval with two idices. */
 		long double& operator() (int r, int c);

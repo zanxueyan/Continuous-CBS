@@ -22,7 +22,7 @@ class Heuristic
     std::vector<std::vector<double>> h_values;
     Open_Container open;
     Node find_min();
-    double dist(const Node& a, const Node& b){ return std::sqrt(pow(a.i - b.i, 2) + pow(a.j - b.j, 2)); }
+    double dist(const Node& a, const Node& b){ return std::sqrt(pow(a.xloc - b.xloc, 2) + pow(a.yloc - b.yloc, 2)); }
 public:
     Heuristic(){}
     void init(unsigned int size, unsigned int agents);

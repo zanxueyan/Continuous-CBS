@@ -134,34 +134,34 @@ namespace pilal {
 	}
 
 	// Operators overloading with storage accessor
-	long double& Matrix::operator() (int i) {
+	long double& Matrix::operator() (int xloc) {
 		if (rows == 1 || columns == 1)
-			return values->at(i);
+			return values->at(xloc);
 		else
 			throw(NotAVectorException());
 	}
 
-	long double const& Matrix::operator() (int i) const {
+	long double const& Matrix::operator() (int xloc) const {
 		if (rows == 1 || columns == 1)
-			return values->at(i);
+			return values->at(xloc);
 		else
 			throw(NotAVectorException());
 	}
 
-	void Matrix::set_row(int i, char const* row) {
+	void Matrix::set_row(int xloc, char const* row) {
 
 		std::stringstream buffer(row);
 
-		for (int j = 0; j < columns; ++j)
-			buffer >> at(i, j);
+		for (int yloc = 0; yloc < columns; ++yloc)
+			buffer >> at(xloc, yloc);
 	}
 
-	void Matrix::set_column(int j, char const* column) {
+	void Matrix::set_column(int yloc, char const* column) {
 
 		std::stringstream buffer(column);
 
-		for (int i = 0; i < rows; ++i)
-			buffer >> at(i, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			buffer >> at(xloc, yloc);
 
 	}
 
@@ -169,9 +169,9 @@ namespace pilal {
 
 		std::stringstream buffer(values);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				buffer >> at(i, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				buffer >> at(xloc, yloc);
 
 	}
 
@@ -201,10 +201,10 @@ namespace pilal {
 		AnonymousMatrix r(rows, m.columns);
 
 		// Core computation
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < m.columns; ++j)
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < m.columns; ++yloc)
 				for (int h = 0; h < columns; ++h)
-					r(i, j) += at(i, h) * m(h, j);
+					r(xloc, yloc) += at(xloc, h) * m(h, yloc);
 		return r;
 	}
 
@@ -217,10 +217,10 @@ namespace pilal {
 		// No fear to change matrix size
 		Matrix r(rows, m.columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < m.columns; ++j)
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < m.columns; ++yloc)
 				for (int h = 0; h < columns; ++h)
-					r(i, j) += at(i, h) * m(h, j);
+					r(xloc, yloc) += at(xloc, h) * m(h, yloc);
 
 		// Swap contents
 		swap(values->contents, r.values->contents);
@@ -240,10 +240,10 @@ namespace pilal {
 		// No fear to change matrix size
 		Matrix r(rows, m.columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < m.columns; ++j)
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < m.columns; ++yloc)
 				for (int h = 0; h < columns; ++h)
-					r(i, j) += at(i, h) * m(h, j);
+					r(xloc, yloc) += at(xloc, h) * m(h, yloc);
 
 		// Swap contents
 		swap(values->contents, r.values->contents);
@@ -261,10 +261,10 @@ namespace pilal {
 		// Allocate return matrix filled with zeroes
 		AnonymousMatrix r(rows, m.columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < m.columns; ++j)
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < m.columns; ++yloc)
 				for (int h = 0; h < columns; ++h)
-					r(i, j) += at(i, h) * m(h, j);
+					r(xloc, yloc) += at(xloc, h) * m(h, yloc);
 
 		// Swap pointers
 		swap(m.values->contents, r.values->contents);                         // Keep m's counter
@@ -327,9 +327,9 @@ namespace pilal {
 
 		AnonymousMatrix r(rows, columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				r(i, j) = at(i, j) - m(i, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				r(xloc, yloc) = at(xloc, yloc) - m(xloc, yloc);
 
 		return r;
 	}
@@ -341,9 +341,9 @@ namespace pilal {
 
 		AnonymousMatrix r(rows, columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				r(i, j) = at(i, j) + m(i, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				r(xloc, yloc) = at(xloc, yloc) + m(xloc, yloc);
 
 		return r;
 	}
@@ -359,17 +359,17 @@ namespace pilal {
 
 	// Aux
 	bool Matrix::more_equal_than(long double value, long double tol = 0.0000000000000001) const {
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				if (at(i, j) + tol < value) return false;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				if (at(xloc, yloc) + tol < value) return false;
 		return true;
 	}
 
 	bool Matrix::less_equal_than(long double value, long double tol = 0.0000000000000001) const {
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				if (at(i, j) - tol > value) return false;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				if (at(xloc, yloc) - tol > value) return false;
 		return true;
 	}
 
@@ -382,10 +382,10 @@ namespace pilal {
 	void Matrix::log(std::string name) const {
 		// Printing
 		printf("-- %s\n", name.c_str());
-		for (int i = 0; i < rows; ++i) {
+		for (int xloc = 0; xloc < rows; ++xloc) {
 			printf(" ");
-			for (int j = 0; j < columns; ++j) {
-				printf("%10.5f ", (double)at(i, j));
+			for (int yloc = 0; yloc < columns; ++yloc) {
+				printf("%10.5f ", (double)at(xloc, yloc));
 			}
 			printf("\n");
 		}
@@ -395,11 +395,11 @@ namespace pilal {
 	void Matrix::logtave(std::string varname) const {
 		// Printing
 		printf("%s = ...\n[", varname.c_str());
-		for (int i = 0; i < rows; ++i) {
+		for (int xloc = 0; xloc < rows; ++xloc) {
 
-			for (int j = 0; j < columns; ++j) {
+			for (int yloc = 0; yloc < columns; ++yloc) {
 
-				printf("%.16f ", (double)at(i, j));
+				printf("%.16f ", (double)at(xloc, yloc));
 			}
 
 			printf(";\n");
@@ -413,8 +413,8 @@ namespace pilal {
 
 	void Matrix::swap_columns(int r, int w) {
 
-		for (int i = 0; i < rows; ++i)
-			swap(values->contents->at(i * columns + r), values->contents->at(i * columns + w));
+		for (int xloc = 0; xloc < rows; ++xloc)
+			swap(values->contents->at(xloc * columns + r), values->contents->at(xloc * columns + w));
 
 		// Waiting for a smarter implementation
 		determinant_up_to_date = false;
@@ -424,8 +424,8 @@ namespace pilal {
 
 	void Matrix::swap_rows(int r, int w) {
 
-		for (int i = 0; i < columns; ++i)
-			swap(values->contents->at(r * columns + i), values->contents->at(w * columns + i));
+		for (int xloc = 0; xloc < columns; ++xloc)
+			swap(values->contents->at(r * columns + xloc), values->contents->at(w * columns + xloc));
 
 		// Waiting for a smarter implementation
 		determinant_up_to_date = false;
@@ -437,10 +437,10 @@ namespace pilal {
 	bool Matrix::is_identity(long double tol) const {
 
 		// Identity check
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				if (((i == j) && !tol_equal(at(i, j), 1, tol)) ||
-					((i != j) && !tol_equal(at(i, j), 0, tol)))
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				if (((xloc == yloc) && !tol_equal(at(xloc, yloc), 1, tol)) ||
+					((xloc != yloc) && !tol_equal(at(xloc, yloc), 0, tol)))
 					return false;
 		return true;
 	}
@@ -451,12 +451,12 @@ namespace pilal {
 			throw(MatrixNotSquareException());
 
 		// Set identity
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				if (i == j)
-					at(i, j) = 1;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				if (xloc == yloc)
+					at(xloc, yloc) = 1;
 				else
-					at(i, j) = 0;
+					at(xloc, yloc) = 0;
 
 		det = 1;
 		determinant_up_to_date = true;
@@ -482,16 +482,16 @@ namespace pilal {
 
 		// If matrix is square just swap the elements
 		if (rows == columns) {
-			for (int j = 1; j < columns; ++j)
-				for (int i = 0; i < j; ++i)
-					swap(at(i, j), at(j, i));
+			for (int yloc = 1; yloc < columns; ++yloc)
+				for (int xloc = 0; xloc < yloc; ++xloc)
+					swap(at(xloc, yloc), at(yloc, xloc));
 			return;
 		}
 
 		AnonymousMatrix tps(columns, rows);
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				tps(j, i) = at(i, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				tps(yloc, xloc) = at(xloc, yloc);
 
 		*this = tps;
 	}
@@ -519,49 +519,49 @@ namespace pilal {
 
 		AnonymousMatrix r(*this);
 
-		int j = 0, pivot = 0;
-		while (j < columns && pivot < rows) {
+		int yloc = 0, pivot = 0;
+		while (yloc < columns && pivot < rows) {
 
 			// Reset tem and tpm elements
 			Matrix tem(rows, 1, 0);
 			tem(pivot, 0) = 1;
 
 			int column_max_position = pivot;
-			long double max = r(column_max_position, j);
+			long double max = r(column_max_position, yloc);
 
 			// Partial pivoting process
-			for (int i = j; i < rows; ++i)
-				if (fabs(r(i, j)) > fabs(max)) {
-					column_max_position = i;
-					max = r(i, j);
+			for (int xloc = yloc; xloc < rows; ++xloc)
+				if (fabs(r(xloc, yloc)) > fabs(max)) {
+					column_max_position = xloc;
+					max = r(xloc, yloc);
 				}
 
 			if (max != 0) {
 
 				// Update U and P with TPM only if necessary
-				if (j != column_max_position)
+				if (yloc != column_max_position)
 					r.swap_rows(pivot, column_max_position);
 
 				// Write tem vector for current column
-				for (int i = pivot + 1; i < rows; ++i)
-					tem(i, 0) = -(r(i, j) / max);
+				for (int xloc = pivot + 1; xloc < rows; ++xloc)
+					tem(xloc, 0) = -(r(xloc, yloc) / max);
 
 				// Optimization of tem * u that takes into account the
 				// shape of tem and u
-				for (int i = pivot + 1; i < rows; ++i) {
+				for (int xloc = pivot + 1; xloc < rows; ++xloc) {
 					Matrix t(1, columns, 0);
 
 					for (int o = pivot; o < columns; ++o)
-						t(o) = tem(i, 0) * r(j, o) + r(i, o);
+						t(o) = tem(xloc, 0) * r(yloc, o) + r(xloc, o);
 
 
 					for (int k = pivot; k < columns; ++k)
-						r(i, k) = t(k);
+						r(xloc, k) = t(k);
 
 				}
 				++pivot;
 			}
-			++j;
+			++yloc;
 		}
 
 		return r;
@@ -583,10 +583,10 @@ namespace pilal {
 
 		bool a_row_is_zero = false;
 
-		for (int i = 0; i < test.rows; ++i) {
+		for (int xloc = 0; xloc < test.rows; ++xloc) {
 			bool row_is_zero = true;
-			for (int j = 0; j < test.columns; j++)
-				if (test(i, j) != 0) {
+			for (int yloc = 0; yloc < test.columns; yloc++)
+				if (test(xloc, yloc) != 0) {
 					row_is_zero = false;
 					break;
 				}
@@ -609,10 +609,10 @@ namespace pilal {
 
 		bool a_row_is_zero = false;
 
-		for (int i = 0; i < test.rows; ++i) {
+		for (int xloc = 0; xloc < test.rows; ++xloc) {
 			bool row_is_zero = true;
-			for (int j = 0; j < test.columns; j++)
-				if (test(i, j) != 0) {
+			for (int yloc = 0; yloc < test.columns; yloc++)
+				if (test(xloc, yloc) != 0) {
 					row_is_zero = false;
 					break;
 				}
@@ -652,30 +652,30 @@ namespace pilal {
 		AnonymousMatrix o_vector(rows, 1);
 
 		// Initialize p_vector, o_vector
-		for (int i = 0; i < rows; ++i) {
-			p_vector(i) = i;
-			o_vector(i) = i;
+		for (int xloc = 0; xloc < rows; ++xloc) {
+			p_vector(xloc) = xloc;
+			o_vector(xloc) = xloc;
 		}
 
 
-		for (int j = 0; j < columns; ++j) {
+		for (int yloc = 0; yloc < columns; ++yloc) {
 
 			// Reset tem and tpm elements
 			Matrix tem(rows, 1, 0);
-			tem(j) = 1;
+			tem(yloc) = 1;
 
 			// Write tpm:
 			//   *  find absolute maximum element j in column i
 			//   *  swap row i with row j in p and u, swap columns in l
 
-			int column_max_position = j;
-			long double max = u(column_max_position, j);
+			int column_max_position = yloc;
+			long double max = u(column_max_position, yloc);
 
 			// Partial pivoting process
-			for (int i = j; i < rows; ++i)
-				if (fabs(u(i, j)) > fabs(max)) {
-					column_max_position = i;
-					max = u(i, j);
+			for (int xloc = yloc; xloc < rows; ++xloc)
+				if (fabs(u(xloc, yloc)) > fabs(max)) {
+					column_max_position = xloc;
+					max = u(xloc, yloc);
 				}
 
 			// If matrix is not singular proceed ..
@@ -683,19 +683,19 @@ namespace pilal {
 				throw (MatrixIsSingularException());
 
 			// Update U and P with TPM only if necessary
-			if (j != column_max_position) {
+			if (yloc != column_max_position) {
 
 				// Update determinant sign
 				determinant = -determinant;
 
 				// Effects of permutation on l and u
-				u.swap_rows(j, column_max_position);
-				l.swap_columns(j, column_max_position);
+				u.swap_rows(yloc, column_max_position);
+				l.swap_columns(yloc, column_max_position);
 
 				// Effects on permutation on p and p_vector
 				if (pf == PF_MATRIX)
-					p.swap_rows(j, column_max_position);
-				p_vector.swap_rows(j, column_max_position);
+					p.swap_rows(yloc, column_max_position);
+				p_vector.swap_rows(yloc, column_max_position);
 
 				// If we're returning the PF_MATRIX set its determinant
 				if (pf == PF_MATRIX)
@@ -703,43 +703,43 @@ namespace pilal {
 			}
 
 			// Write tem vector for current column
-			for (int i = j + 1; i < rows; ++i)
-				tem(i) = -(u(i, j) / max);
+			for (int xloc = yloc + 1; xloc < rows; ++xloc)
+				tem(xloc) = -(u(xloc, yloc) / max);
 
 			// Optimization of l * tem that takes into account the shape
 			// of l and tem
-			for (int i = 0; i < rows; ++i) {
-				register long double inv_product = l(i, j);   // because tem(j,0) == 1
+			for (int xloc = 0; xloc < rows; ++xloc) {
+				register long double inv_product = l(xloc, yloc);   // because tem(j,0) == 1
 
-				for (int k = j + 1; k < columns; ++k)
-					inv_product += l(i, k) * -tem(k);
+				for (int k = yloc + 1; k < columns; ++k)
+					inv_product += l(xloc, k) * -tem(k);
 
-				l(i, j) = inv_product;
+				l(xloc, yloc) = inv_product;
 			}
 
 			// Optimization of tem * u that takes into account the
 			// shape of tem and u
-			for (int i = j + 1; i < rows; ++i) {
+			for (int xloc = yloc + 1; xloc < rows; ++xloc) {
 				Matrix r(1, columns, 0);
 
-				for (int o = j; o < columns; ++o)
-					r(o) = tem(i) * u(j, o) + u(i, o);
+				for (int o = yloc; o < columns; ++o)
+					r(o) = tem(xloc) * u(yloc, o) + u(xloc, o);
 
-				for (int k = j; k < columns; ++k)
-					u(i, k) = r(k);
+				for (int k = yloc; k < columns; ++k)
+					u(xloc, k) = r(k);
 			}
 		}
 
 		// Optimized way to calculate p * l, a permutation vector
 		// is used to swap the rows of l        
-		for (int i = 0; i < rows; ++i)
-			while (p_vector(i) != o_vector(i)) {
-				int k = i + 1;
-				while (p_vector(k) != o_vector(i))
+		for (int xloc = 0; xloc < rows; ++xloc)
+			while (p_vector(xloc) != o_vector(xloc)) {
+				int k = xloc + 1;
+				while (p_vector(k) != o_vector(xloc))
 					k++;
 
-				o_vector.swap_rows(i, k);
-				l.swap_rows(i, k);
+				o_vector.swap_rows(xloc, k);
+				l.swap_rows(xloc, k);
 			}
 
 
@@ -748,8 +748,8 @@ namespace pilal {
 			p = p_vector;
 
 		// Compute and set determinant        
-		for (int i = 0; i < rows; ++i)
-			determinant *= u(i, i);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			determinant *= u(xloc, xloc);
 
 		determinant_up_to_date = true;
 
@@ -771,72 +771,72 @@ namespace pilal {
 
 		// Set original permutation vector
 		Matrix o_vector(rows, 1);
-		for (int i = 0; i < rows; ++i)
-			o_vector(i) = i;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			o_vector(xloc) = xloc;
 
 		// Copy transposed l
 		l_inverse.transpose();
 
 		// Set reciprocals on the diagonal of u, useless in l since they are ones
-		for (int i = 0; i < rows; ++i)
-			u_inverse(i, i) = 1 / u_inverse(i, i);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			u_inverse(xloc, xloc) = 1 / u_inverse(xloc, xloc);
 
 		// Calculate inverse of l
-		for (int i = 1; i < rows; ++i)
-			for (int j = i - 1; j >= 0; --j) {
+		for (int xloc = 1; xloc < rows; ++xloc)
+			for (int yloc = xloc - 1; yloc >= 0; --yloc) {
 				register long double dot_product = 0;
-				for (int k = i; k > 0; --k)
-					dot_product += l_inverse(i, k) * l_inverse(j, k);
-				l_inverse(i, j) = -dot_product;                                 // Optimization of dot_product * - l_inverse.at(j,j)
+				for (int k = xloc; k > 0; --k)
+					dot_product += l_inverse(xloc, k) * l_inverse(yloc, k);
+				l_inverse(xloc, yloc) = -dot_product;                                 // Optimization of dot_product * - l_inverse.at(j,j)
 			}
 
 		// Set zeroes on the upper half of l^-1
-		for (int i = 0; i < rows; ++i)
-			for (int j = i + 1; j < columns; ++j)
-				l_inverse(i, j) = 0;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = xloc + 1; yloc < columns; ++yloc)
+				l_inverse(xloc, yloc) = 0;
 
 		// Calculate inverse of u
-		for (int i = 1; i < rows; ++i)
-			for (int j = i - 1; j >= 0; --j) {
+		for (int xloc = 1; xloc < rows; ++xloc)
+			for (int yloc = xloc - 1; yloc >= 0; --yloc) {
 				register long double dot_product = 0;
-				for (int k = i; k > 0; --k) {
-					dot_product += u_inverse(i, k) * u_inverse(j, k);
+				for (int k = xloc; k > 0; --k) {
+					dot_product += u_inverse(xloc, k) * u_inverse(yloc, k);
 				}
-				u_inverse(i, j) = dot_product * -u_inverse(j, j);
+				u_inverse(xloc, yloc) = dot_product * -u_inverse(yloc, yloc);
 			}
 
 		u_inverse.transpose();
 
 
 		// Set zeroes on the lower half of u^-1
-		for (int j = 0; j < columns; ++j)
-			for (int i = j + 1; i < rows; ++i)
-				u_inverse(i, j) = 0;
+		for (int yloc = 0; yloc < columns; ++yloc)
+			for (int xloc = yloc + 1; xloc < rows; ++xloc)
+				u_inverse(xloc, yloc) = 0;
 
 
 
 		// Optimization of u^-1 * l^-1 that takes into account the
 		// shape of the two matrices
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < columns; ++j)
-				for (int h = columns - 1; h >= std::min(i, j); --h)
-					inverse(i, j) += u_inverse(i, h) * l_inverse(h, j);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < columns; ++yloc)
+				for (int h = columns - 1; h >= std::min(xloc, yloc); --h)
+					inverse(xloc, yloc) += u_inverse(xloc, h) * l_inverse(h, yloc);
 
 		// Smart way to translate a row permutation vector to obtain
 		// a column permutation vector
 		Matrix p_vector_t(rows, 1);
-		for (int i = 0; i < rows; ++i)
-			p_vector_t(p_vector(i)) = i;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			p_vector_t(p_vector(xloc)) = xloc;
 
 		// Optimization of columns permutation
-		for (int i = 0; i < rows; ++i)
-			while (p_vector_t(i) != o_vector(i)) {
-				int k = i + 1;
-				while (p_vector_t(k) != o_vector(i))
+		for (int xloc = 0; xloc < rows; ++xloc)
+			while (p_vector_t(xloc) != o_vector(xloc)) {
+				int k = xloc + 1;
+				while (p_vector_t(k) != o_vector(xloc))
 					k++;
 
-				o_vector.swap_rows(i, k);
-				inverse.swap_columns(i, k);
+				o_vector.swap_rows(xloc, k);
+				inverse.swap_columns(xloc, k);
 			}
 	}
 
@@ -849,12 +849,12 @@ namespace pilal {
 		new_inverse.resize(old_inverse.rows, old_inverse.columns);
 		Matrix a_tilde(old_inverse * new_column);
 
-		for (int i = 0; i < old_inverse.rows; ++i)
-			for (int j = 0; j < old_inverse.columns; ++j)
-				if (i != q)
-					new_inverse(i, j) = old_inverse(i, j) - ((old_inverse(q, j) * a_tilde(i)) / a_tilde(q));
+		for (int xloc = 0; xloc < old_inverse.rows; ++xloc)
+			for (int yloc = 0; yloc < old_inverse.columns; ++yloc)
+				if (xloc != q)
+					new_inverse(xloc, yloc) = old_inverse(xloc, yloc) - ((old_inverse(q, yloc) * a_tilde(xloc)) / a_tilde(q));
 				else
-					new_inverse(i, j) = old_inverse(q, j) / a_tilde(q);
+					new_inverse(xloc, yloc) = old_inverse(q, yloc) / a_tilde(q);
 
 
 	}
@@ -872,63 +872,63 @@ namespace pilal {
 		l_inverse.transpose();
 
 		// Set reciprocals on the diagonal of u (useless in l since diagonal elements are ones)
-		for (int i = 0; i < rows; ++i)
-			u_inverse(i, i) = 1 / u_inverse(i, i);
+		for (int xloc = 0; xloc < rows; ++xloc)
+			u_inverse(xloc, xloc) = 1 / u_inverse(xloc, xloc);
 
 		// Calculate inverse of l
-		for (int i = 1; i < rows; ++i)
-			for (int j = i - 1; j >= 0; --j) {
+		for (int xloc = 1; xloc < rows; ++xloc)
+			for (int yloc = xloc - 1; yloc >= 0; --yloc) {
 				register long double dot_product = 0;
-				for (int k = i; k > 0; --k)
-					dot_product += l_inverse(i, k) * l_inverse(j, k);
-				l_inverse(i, j) = -dot_product;                                 // Optimization due to ones on diagonal
+				for (int k = xloc; k > 0; --k)
+					dot_product += l_inverse(xloc, k) * l_inverse(yloc, k);
+				l_inverse(xloc, yloc) = -dot_product;                                 // Optimization due to ones on diagonal
 			}
 
 		// Set zeroes on the upper half of l^-1
-		for (int i = 0; i < rows; ++i)
-			for (int j = i + 1; j < columns; ++j)
-				l_inverse(i, j) = 0;
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = xloc + 1; yloc < columns; ++yloc)
+				l_inverse(xloc, yloc) = 0;
 
 		// Calculate inverse of u
-		for (int i = 1; i < rows; ++i)
-			for (int j = i - 1; j >= 0; --j) {
+		for (int xloc = 1; xloc < rows; ++xloc)
+			for (int yloc = xloc - 1; yloc >= 0; --yloc) {
 				register long double dot_product = 0;
-				for (int k = i; k > 0; --k) {
-					dot_product += u_inverse(i, k) * u_inverse(j, k);
+				for (int k = xloc; k > 0; --k) {
+					dot_product += u_inverse(xloc, k) * u_inverse(yloc, k);
 				}
-				u_inverse(i, j) = dot_product * -u_inverse(j, j);
+				u_inverse(xloc, yloc) = dot_product * -u_inverse(yloc, yloc);
 			}
 
 		u_inverse.transpose();
 
 		// Set zeroes on the lower half of u^-1
-		for (int j = 0; j < columns; ++j)
-			for (int i = j + 1; i < rows; ++i)
-				u_inverse(i, j) = 0;
+		for (int yloc = 0; yloc < columns; ++yloc)
+			for (int xloc = yloc + 1; xloc < rows; ++xloc)
+				u_inverse(xloc, yloc) = 0;
 
 		// Optimization of p * b
 		Matrix pb(rows, 1);
-		for (int i = 0; i < rows; ++i)
-			pb(i) = b(p_vector(i));
+		for (int xloc = 0; xloc < rows; ++xloc)
+			pb(xloc) = b(p_vector(xloc));
 
 		// Set x shape	
 		x.resize(rows, 1);
 
 		// Optimization of x = l_inverse * pb;
-		for (int i = 0; i < rows; ++i) {
-			register long double dot_product = pb(i);
-			for (int j = 0; j < i; ++j) {
-				dot_product += l_inverse(i, j) * pb(j);
+		for (int xloc = 0; xloc < rows; ++xloc) {
+			register long double dot_product = pb(xloc);
+			for (int yloc = 0; yloc < xloc; ++yloc) {
+				dot_product += l_inverse(xloc, yloc) * pb(yloc);
 			}
-			x(i) = dot_product;
+			x(xloc) = dot_product;
 		}
 
 		// Optimization of x = u_inverse * x
-		for (int i = 0; i < rows; ++i) {
+		for (int xloc = 0; xloc < rows; ++xloc) {
 			register long double dot_product = 0;
-			for (int j = columns - 1; j >= i; --j)
-				dot_product += u_inverse(i, j) * x(j);
-			x(i) = dot_product;
+			for (int yloc = columns - 1; yloc >= xloc; --yloc)
+				dot_product += u_inverse(xloc, yloc) * x(yloc);
+			x(xloc) = dot_product;
 		}
 	}
 
@@ -1026,10 +1026,10 @@ namespace pilal {
 		// Allocate return matrix filled with zeroes
 		AnonymousMatrix r(rows, m.columns);
 
-		for (int i = 0; i < rows; ++i)
-			for (int j = 0; j < m.columns; ++j)
+		for (int xloc = 0; xloc < rows; ++xloc)
+			for (int yloc = 0; yloc < m.columns; ++yloc)
 				for (int h = 0; h < columns; ++h)
-					r(i, j) += at(i, h) * m(h, j);
+					r(xloc, yloc) += at(xloc, h) * m(h, yloc);
 
 		// Swap pointers
 		rows = r.rows;

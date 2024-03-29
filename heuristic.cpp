@@ -4,13 +4,13 @@ void Heuristic::init(unsigned int size, unsigned int agents)
 {
     h_values.clear();
     h_values.resize(size);
-    for(unsigned int i = 0; i < size; i++)
-        h_values[i].resize(agents, -1);
+    for(unsigned int xloc = 0; xloc < size; xloc++)
+        h_values[xloc].resize(agents, -1);
 }
 
 void Heuristic::count(const Map &map, Agent agent)
 {
-    Node curNode(agent.goal_id, 0, 0, agent.goal_i, agent.goal_j), newNode;
+    Node curNode(agent.goal_id, 0, 0, agent.goal_xloc, agent.goal_yloc), newNode;
     open.clear();
     open.insert(curNode);
     while(!open.empty())
@@ -20,8 +20,8 @@ void Heuristic::count(const Map &map, Agent agent)
         std::vector<Node> valid_moves = map.get_valid_moves(curNode.id);
         for(auto move: valid_moves)
         {
-            newNode.i = move.i;
-            newNode.j = move.j;
+            newNode.xloc = move.xloc;
+            newNode.yloc = move.yloc;
             newNode.id = move.id;
             newNode.g = curNode.g + dist(curNode, newNode);
             if(h_values[newNode.id][agent.id] < 0)

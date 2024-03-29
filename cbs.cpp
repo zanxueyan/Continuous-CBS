@@ -5,9 +5,9 @@ bool CBS::init_root(const Map &map, const Task &task)
     CBS_Node root;
     tree.set_focal_weight(config.focal_weight);
     sPath path;
-    for(int i = 0; i < int(task.get_agents_size()); i++)
+    for(int xloc = 0; xloc < int(task.get_agents_size()); xloc++)
     {
-        Agent agent = task.get_agent(i);
+        Agent agent = task.get_agent(xloc);
         path = planner.find_path(agent, map, {}, h_values);
         if(path.cost < 0)
             return false;
@@ -150,13 +150,13 @@ double CBS::get_hl_heuristic(const std::list<Conflict> &conflicts)
 
         pilal::Matrix coefficients(conflicts.size(), colliding_agents.size(), 0);
         std::vector<double> overcosts(conflicts.size());
-        int i(0);
+        int xloc(0);
         for(auto c:conflicts)
         {
-            coefficients.at(i, colliding_agents.at(c.agent1)) = 1;
-            coefficients.at(i, colliding_agents.at(c.agent2)) = 1;
-            overcosts[i] = c.overcost;
-            i++;
+            coefficients.at(xloc, colliding_agents.at(c.agent1)) = 1;
+            coefficients.at(xloc, colliding_agents.at(c.agent2)) = 1;
+            overcosts[xloc] = c.overcost;
+            xloc++;
         }
         simplex.set_problem(coefficients, overcosts);
         simplex.solve();
@@ -244,9 +244,9 @@ Solution CBS::find_solution(const Map &map, const Task &task, const Config &cfg)
     config = cfg;
     this->map = &map;
     h_values.init(map.get_size(), task.get_agents_size());
-    for(int i = 0; i < int(task.get_agents_size()); i++)
+    for(int xloc = 0; xloc < int(task.get_agents_size()); xloc++)
     {
-        Agent agent = task.get_agent(i);
+        Agent agent = task.get_agent(xloc);
         h_values.count(map, agent);
     }
     auto t = std::chrono::high_resolution_clock::now();
@@ -650,20 +650,20 @@ std::vector<Conflict> CBS::get_all_conflicts(const std::vector<sPath> &paths, in
     std::vector<Conflict> conflicts;
     //check all agents
     if(id < 0)
-        for(unsigned int i = 0; i < paths.size(); i++)
-            for(unsigned int j = i + 1; j < paths.size(); j++)
+        for(unsigned int xloc = 0; xloc < paths.size(); xloc++)
+            for(unsigned int yloc = xloc + 1; yloc < paths.size(); yloc++)
             {
-                Conflict conflict = check_paths(paths[i], paths[j]);
+                Conflict conflict = check_paths(paths[xloc], paths[yloc]);
                 if(conflict.agent1 >= 0)
                     conflicts.push_back(conflict);
             }
     else
     {
-        for(unsigned int i = 0; i < paths.size(); i++)
+        for(unsigned int xloc = 0; xloc < paths.size(); xloc++)
         {
-            if(int(i) == id)
+            if(int(xloc) == id)
                 continue;
-            Conflict conflict = check_paths(paths[i], paths[id]);
+            Conflict conflict = check_paths(paths[xloc], paths[id]);
             if(conflict.agent1 >= 0)
                 conflicts.push_back(conflict);
         }
@@ -692,8 +692,8 @@ std::vector<sPath> CBS::get_paths(CBS_Node *node, unsigned int agents_size)
             paths.at(curNode->paths.begin()->agentID) = *curNode->paths.begin();
         curNode = curNode->parent;
     }
-    for(unsigned int i = 0; i < agents_size; i++)
-        if(paths.at(i).cost < 0)
-            paths.at(i) = curNode->paths.at(i);
+    for(unsigned int xloc = 0; xloc < agents_size; xloc++)
+        if(paths.at(xloc).cost < 0)
+            paths.at(xloc) = curNode->paths.at(xloc);
     return paths;
 }

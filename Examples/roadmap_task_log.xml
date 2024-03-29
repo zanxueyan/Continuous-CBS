@@ -11,7 +11,7 @@
     <agent start_id="161" goal_id="32"/>
     <agent start_id="119" goal_id="154"/>
     <log>
-        <summary time="0.026626" flowtime="909.56144746583766" makespan="261.33292577117703"/>
+        <summary time="0.023275899999999999" flowtime="909.56144746583766" makespan="261.33292577117703"/>
         <agent number="0">
             <path duration="261.33292577117703">
                 <section number="0" start_i="238.71000000000001" start_j="65.760300000000001" goal_i="209.81100000000001" goal_j="83.082599999999999" duration="33.692941075097615"/>
